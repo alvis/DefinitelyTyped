@@ -73,11 +73,20 @@ interface HighlandStatic {
   <R>(): Highland.Stream<R>;
   <R>(xs: Highland.Stream<R>[]): Highland.Stream<R>;
   <R>(xs: R[]): Highland.Stream<R>;
-  <R>(xs: (push: (err: Error | null, x?: R | Highland.Nil) => void, next: () => void) => void): Highland.Stream<R>;
+  <R>(
+    xs: (
+      push: (err: Error | null, x?: R | Highland.Nil) => void,
+      next: () => void
+    ) => void
+  ): Highland.Stream<R>;
 
   <R>(xs: Highland.Stream<R>): Highland.Stream<R>;
   <R>(xs: NodeJS.ReadableStream): Highland.Stream<R>;
-  <R>(eventName: string, xs: NodeJS.EventEmitter, mappingHint?: Highland.MappingHint): Highland.Stream<R>;
+  <R>(
+    eventName: string,
+    xs: NodeJS.EventEmitter,
+    mappingHint?: Highland.MappingHint
+  ): Highland.Stream<R>;
 
   // moar (promise for everything?)
   <R>(xs: Highland.Thenable<Highland.Stream<R>>): Highland.Stream<R>;
@@ -150,7 +159,10 @@ interface HighlandStatic {
    * @param {Array | Function | Number} [mappingHint] - how to pass the arguments to the callback
    * @api public
    */
-  wrapCallback(f: Function, mappingHint?: Highland.MappingHint): (...args: any[]) => Highland.Stream<any>;
+  wrapCallback(
+    f: Function,
+    mappingHint?: Highland.MappingHint
+  ): (...args: any[]) => Highland.Stream<any>;
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   // OBJECTS
@@ -365,12 +377,23 @@ interface HighlandStatic {
 }
 
 declare namespace Highland {
-
   interface Thenable<R> {
-    then<U>(onFulfilled: (value: R) => Thenable<U>,  onRejected: (error: any) => Thenable<U>): Thenable<U>;
-    then<U>(onFulfilled: (value: R) => Thenable<U>, onRejected?: (error: any) => U): Thenable<U>;
-    then<U>(onFulfilled: (value: R) => U, onRejected: (error: any) => Thenable<U>): Thenable<U>;
-    then<U>(onFulfilled?: (value: R) => U, onRejected?: (error: any) => U): Thenable<U>;
+    then<U>(
+      onFulfilled: (value: R) => Thenable<U>,
+      onRejected: (error: any) => Thenable<U>
+    ): Thenable<U>;
+    then<U>(
+      onFulfilled: (value: R) => Thenable<U>,
+      onRejected?: (error: any) => U
+    ): Thenable<U>;
+    then<U>(
+      onFulfilled: (value: R) => U,
+      onRejected: (error: any) => Thenable<U>
+    ): Thenable<U>;
+    then<U>(
+      onFulfilled?: (value: R) => U,
+      onRejected?: (error: any) => U
+    ): Thenable<U>;
   }
   // hacky unique
   // TODO do we need this?
@@ -393,9 +416,9 @@ declare namespace Highland {
   /**
    * Used as a Redirect marker when writing to a Stream's incoming buffer
    */
-    // TODO is this public?
+  // TODO is this public?
   class StreamRedirect<R> {
-    constructor(to: Stream<R>)
+    constructor(to: Stream<R>);
 
     to: Stream<R>;
   }
@@ -405,7 +428,6 @@ declare namespace Highland {
    * Actual Stream constructor wrapped the the main exported function
    */
   interface Stream<R> extends NodeJS.EventEmitter {
-
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // STREAM OBJECTS
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -561,7 +583,14 @@ declare namespace Highland {
      * @param {Function} f - the function to handle errors and values
      * @api public
      */
-    consume<U>(f: (err: Error, x: R, push: (err: Error | null, value?: U | Highland.Nil) => void, next: () => void) => void): Stream<U>;
+    consume<U>(
+      f: (
+        err: Error,
+        x: R,
+        push: (err: Error | null, value?: U | Highland.Nil) => void,
+        next: () => void
+      ) => void
+    ): Stream<U>;
 
     /**
      * Holds off pushing data events downstream until there has been no more
@@ -612,9 +641,9 @@ declare namespace Highland {
      *
      * _([1, 2, 3, 4]).drop(2) // => 3, 4
      */
-     drop(n: number): Stream<R>;
+    drop(n: number): Stream<R>;
 
-     /**
+    /**
      * Extracts errors from a Stream and applies them to an error handler
      * function. Returns a new Stream with the errors removed (unless the error
      * handler chooses to rethrow them using `push`). Errors can also be
@@ -626,7 +655,12 @@ declare namespace Highland {
      * @param {Function} f - the function to pass all errors to
      * @api public
      */
-    errors(f: (err: Error, push: (err: Error | null, x?: R | Highland.Nil) => void) => void): Stream<R>;
+    errors(
+      f: (
+        err: Error,
+        push: (err: Error | null, x?: R | Highland.Nil) => void
+      ) => void
+    ): Stream<R>;
 
     /**
      * Creates a new Stream including only the values which pass a truth test.
@@ -651,7 +685,7 @@ declare namespace Highland {
      */
     find(f: (x: R) => boolean): Stream<R>;
 
-     /**
+    /**
      * A convenient form of [where](#where), which returns the first object from a
      * Stream that matches a set of property values. findWhere is to [where](#where) as [find](#find) is to [filter](#filter).
      *
@@ -689,8 +723,8 @@ declare namespace Highland {
      * @api public
      */
     // TODO verify this
-    group(f: (x: R) => string): Stream<{[prop:string]:R[]}>;
-    group(prop: string): Stream<{[prop:string]:R[]}>;
+    group(f: (x: R) => string): Stream<{ [prop: string]: R[] }>;
+    group(prop: string): Stream<{ [prop: string]: R[] }>;
 
     /**
      * Creates a new Stream with only the first value from the source.
@@ -854,7 +888,7 @@ declare namespace Highland {
      *
      * _([1, 2, 3, 4]).scan1(add) // => 1, 3, 6, 10
      */
-    scan1<U>(memo: U, x: (memo: U, x: R) => U): Stream<U>;
+    scan1(f: (memo: R, x: R) => R): Stream<R>;
 
     /**
      * Like the [errors](#errors) method, but emits a Stream end marker after
@@ -1167,7 +1201,7 @@ declare namespace Highland {
      * @param {Function} f - the iterator function
      * @api public
      */
-      each(f: (x: R) => void): Pick<Stream<R>, 'done'>;
+    each(f: (x: R) => void): Pick<Stream<R>, 'done'>;
 
     /**
      * Pipes a Highland Stream to a [Node Writable Stream](http://nodejs.org/api/stream.html#stream_class_stream_writable)
@@ -1270,13 +1304,13 @@ declare namespace Highland {
   interface PipeableStream<T, R> extends Stream<R> {}
 
   interface PipeOptions {
-    end: boolean
+    end: boolean;
   }
 
   type MappingHint = number | string[] | Function;
 }
 
-declare var highland:HighlandStatic;
+declare var highland: HighlandStatic;
 
 declare module 'highland' {
   export = highland;
